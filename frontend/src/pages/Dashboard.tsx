@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { useAuth } from '../context/AuthContext';
 
 ChartJS.register(
   CategoryScale,
@@ -32,9 +33,11 @@ interface AggregatedData {
 const Dashboard: React.FC = () => {
   const [aggregatedData, setAggregatedData] = useState<AggregatedData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { principal } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!principal) return;
       try {
         const result = await backend.getAggregatedData();
         setAggregatedData({
@@ -50,7 +53,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [principal]);
 
   if (loading) {
     return <CircularProgress />;

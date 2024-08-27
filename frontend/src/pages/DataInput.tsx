@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Typography, TextField, Button, Grid, Paper, CircularProgress } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { backend } from '../../declarations/backend';
+import { useAuth } from '../context/AuthContext';
 
 interface FormData {
   weight: string;
@@ -12,8 +13,10 @@ interface FormData {
 const DataInput: React.FC = () => {
   const { control, handleSubmit, reset } = useForm<FormData>();
   const [loading, setLoading] = useState(false);
+  const { principal } = useAuth();
 
   const onSubmit = async (data: FormData) => {
+    if (!principal) return;
     setLoading(true);
     try {
       const result = await backend.addBiometricData(

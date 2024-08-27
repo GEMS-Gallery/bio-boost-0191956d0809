@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Typography, Paper, CircularProgress } from '@mui/material';
 import { backend } from '../../declarations/backend';
 import DataTable from 'react-data-table-component';
+import { useAuth } from '../context/AuthContext';
 
 interface BiometricData {
   weight: number | null;
@@ -13,9 +14,11 @@ interface BiometricData {
 const History: React.FC = () => {
   const [biometricData, setBiometricData] = useState<BiometricData[]>([]);
   const [loading, setLoading] = useState(true);
+  const { principal } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!principal) return;
       try {
         const endTime = BigInt(Date.now() * 1000000);
         const startTime = BigInt(0); // Fetch all data
@@ -29,7 +32,7 @@ const History: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [principal]);
 
   const columns = [
     {

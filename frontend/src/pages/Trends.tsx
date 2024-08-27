@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { useAuth } from '../context/AuthContext';
 
 ChartJS.register(
   CategoryScale,
@@ -33,9 +34,11 @@ interface BiometricData {
 const Trends: React.FC = () => {
   const [biometricData, setBiometricData] = useState<BiometricData[]>([]);
   const [loading, setLoading] = useState(true);
+  const { principal } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!principal) return;
       try {
         const endTime = BigInt(Date.now() * 1000000);
         const startTime = endTime - BigInt(30 * 24 * 60 * 60 * 1000000000); // 30 days ago
@@ -49,7 +52,7 @@ const Trends: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [principal]);
 
   if (loading) {
     return <CircularProgress />;
