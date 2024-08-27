@@ -41,6 +41,8 @@ interface Workout {
   caloriesBurned: number;
 }
 
+const workoutTypes = ['Hiit', 'Cardio', 'Weightlifting', 'Liit', 'Other'];
+
 const Workouts: React.FC = () => {
   const { control, handleSubmit, reset } = useForm<WorkoutFormData>();
   const [loading, setLoading] = useState(false);
@@ -107,18 +109,23 @@ const Workouts: React.FC = () => {
     ],
   };
 
+  const initialWorkoutTypeCounts = workoutTypes.reduce((acc, type) => {
+    acc[type] = 0;
+    return acc;
+  }, {} as Record<string, number>);
+
   const workoutTypeCounts = workouts.reduce((acc, workout) => {
     const type = workout.workoutType;
     acc[type] = (acc[type] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {...initialWorkoutTypeCounts});
 
   const workoutTypeCountsData = {
-    labels: Object.keys(workoutTypeCounts),
+    labels: workoutTypes,
     datasets: [
       {
         label: 'Number of Workouts by Type',
-        data: Object.values(workoutTypeCounts),
+        data: workoutTypes.map(type => workoutTypeCounts[type] || 0),
         backgroundColor: 'rgba(255, 159, 64, 0.5)',
       },
     ],
@@ -145,11 +152,9 @@ const Workouts: React.FC = () => {
                     <FormControl fullWidth>
                       <InputLabel>Workout Type</InputLabel>
                       <Select {...field} label="Workout Type">
-                        <MenuItem value="Hiit">HIIT</MenuItem>
-                        <MenuItem value="Cardio">Cardio</MenuItem>
-                        <MenuItem value="Weightlifting">Weightlifting</MenuItem>
-                        <MenuItem value="Liit">LIIT</MenuItem>
-                        <MenuItem value="Other">Other</MenuItem>
+                        {workoutTypes.map(type => (
+                          <MenuItem key={type} value={type}>{type}</MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   )}

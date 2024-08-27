@@ -5,7 +5,6 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import DataInput from './pages/DataInput';
 import Trends from './pages/Trends';
-import History from './pages/History';
 import Login from './pages/Login';
 import Workouts from './pages/Workouts';
 import { useAuth } from './context/AuthContext';
@@ -26,7 +25,6 @@ function App() {
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/input" element={<PrivateRoute><DataInput /></PrivateRoute>} />
           <Route path="/trends" element={<PrivateRoute><Trends /></PrivateRoute>} />
-          <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
           <Route path="/workouts" element={<PrivateRoute><Workouts /></PrivateRoute>} />
         </Routes>
       </Container>
