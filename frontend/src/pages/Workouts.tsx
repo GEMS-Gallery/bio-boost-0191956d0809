@@ -107,6 +107,23 @@ const Workouts: React.FC = () => {
     ],
   };
 
+  const workoutTypeCounts = workouts.reduce((acc, workout) => {
+    const type = workout.workoutType;
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const workoutTypeCountsData = {
+    labels: Object.keys(workoutTypeCounts),
+    datasets: [
+      {
+        label: 'Number of Workouts by Type',
+        data: Object.values(workoutTypeCounts),
+        backgroundColor: 'rgba(255, 159, 64, 0.5)',
+      },
+    ],
+  };
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -202,7 +219,7 @@ const Workouts: React.FC = () => {
           </form>
         </Paper>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>
             Cumulative Calories Burned
@@ -210,12 +227,20 @@ const Workouts: React.FC = () => {
           <Line data={cumulativeCaloriesData} />
         </Paper>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={4}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>
             Calories Burned per Workout
           </Typography>
           <Bar data={caloriesPerWorkoutData} />
+        </Paper>
+      </Grid>
+      <Grid item xs={12} md={4}>
+        <Paper sx={{ p: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Number of Workouts by Type
+          </Typography>
+          <Bar data={workoutTypeCountsData} />
         </Paper>
       </Grid>
     </Grid>
