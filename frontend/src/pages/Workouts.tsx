@@ -35,7 +35,7 @@ interface WorkoutFormData {
 }
 
 interface Workout {
-  workoutType: string;
+  workoutType: { [key: string]: null };
   startTime: bigint;
   endTime: bigint;
   caloriesBurned: number;
@@ -58,6 +58,7 @@ const Workouts: React.FC = () => {
     try {
       const result = await backend.getWorkouts();
       setWorkouts(result);
+      console.log('Fetched workouts:', result);
     } catch (error) {
       console.error('Error fetching workouts:', error);
     }
@@ -115,10 +116,16 @@ const Workouts: React.FC = () => {
   }, {} as Record<string, number>);
 
   const workoutTypeCounts = workouts.reduce((acc, workout) => {
-    const type = workout.workoutType;
-    acc[type] = (acc[type] || 0) + 1;
+    const type = Object.keys(workout.workoutType)[0];
+    if (workoutTypes.includes(type)) {
+      acc[type] = (acc[type] || 0) + 1;
+    } else {
+      acc['Other'] = (acc['Other'] || 0) + 1;
+    }
     return acc;
   }, {...initialWorkoutTypeCounts});
+
+  console.log('Workout type counts:', workoutTypeCounts);
 
   const workoutTypeCountsData = {
     labels: workoutTypes,
@@ -229,7 +236,11 @@ const Workouts: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Cumulative Calories Burned
           </Typography>
-          <Line data={cumulativeCaloriesData} />
+          {workouts.length > 0 ? (
+            <Line data={cumulativeCaloriesData} />
+          ) : (
+            <Typography>No workout data available</Typography>
+          )}
         </Paper>
       </Grid>
       <Grid item xs={12} md={4}>
@@ -237,7 +248,11 @@ const Workouts: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Calories Burned per Workout
           </Typography>
-          <Bar data={caloriesPerWorkoutData} />
+          {workouts.length > 0 ? (
+            <Bar data={caloriesPerWorkoutData} />
+          ) : (
+            <Typography>No workout data available</Typography>
+          )}
         </Paper>
       </Grid>
       <Grid item xs={12} md={4}>
@@ -245,7 +260,11 @@ const Workouts: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Number of Workouts by Type
           </Typography>
-          <Bar data={workoutTypeCountsData} />
+          {Object.values(workoutTypeCounts).some(count => count > 0) ? (
+            <Bar data={workoutTypeCountsData} />
+          ) : (
+            <Typography>No workout data available</Typography>
+          )}
         </Paper>
       </Grid>
     </Grid>
