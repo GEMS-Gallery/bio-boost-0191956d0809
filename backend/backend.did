@@ -1,0 +1,24 @@
+type Time = int;
+type Result = 
+ variant {
+   err: text;
+   ok: text;
+ };
+type BiometricData = 
+ record {
+   heartRate: opt float64;
+   sleepDuration: opt float64;
+   timestamp: Time;
+   weight: opt float64;
+ };
+service : {
+  addBiometricData: (opt float64, opt float64, opt float64) -> (Result);
+  getAggregatedData: () ->
+   (record {
+      avgHeartRate: opt float64;
+      avgSleepDuration: opt float64;
+      avgWeight: opt float64;
+    }) query;
+  getBiometricData: (Time, Time) -> (vec BiometricData) query;
+  getLatestBiometricData: () -> (opt BiometricData) query;
+}
