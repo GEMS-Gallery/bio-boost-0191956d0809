@@ -18,8 +18,25 @@ actor {
     timestamp: Time.Time;
   };
 
+  type WorkoutType = {
+    #Hiit;
+    #Cardio;
+    #Weightlifting;
+    #Liit;
+    #Other;
+  };
+
+  type Workout = {
+    workoutType: WorkoutType;
+    startTime: Time.Time;
+    endTime: Time.Time;
+    caloriesBurned: Float;
+  };
+
   stable var biometricDataEntries : [(Principal, [(Text, BiometricData)])] = [];
+  stable var workoutEntries : [(Principal, [Workout])] = [];
   var biometricData = HashMap.HashMap<Principal, HashMap.HashMap<Text, BiometricData>>(0, Principal.equal, Principal.hash);
+  var workoutData = HashMap.HashMap<Principal, [Workout]>(0, Principal.equal, Principal.hash);
 
   public shared(msg) func addBiometricData(weight: ?Float, heartRate: ?Float, sleepDuration: ?Float) : async Result.Result<Text, Text> {
     let caller = msg.caller;
@@ -46,6 +63,27 @@ actor {
     #ok("Data added successfully")
   };
 
+  public shared(msg) func addWorkout(workoutType: WorkoutType, startTime: Time.Time, endTime: Time.Time, caloriesBurned: Float) : async Result.Result<Text, Text> {
+    let caller = msg.caller;
+    let workout : Workout = {
+      workoutType;
+      startTime;
+      endTime;
+      caloriesBurned;
+    };
+    
+    switch (workoutData.get(caller)) {
+      case null {
+        workoutData.put(caller, [workout]);
+      };
+      case (?userWorkouts) {
+        workoutData.put(caller, Array.append(userWorkouts, [workout]));
+      };
+    };
+    
+    #ok("Workout added successfully")
+  };
+
   public query(msg) func getBiometricData(start: Time.Time, end: Time.Time) : async [BiometricData] {
     let caller = msg.caller;
     switch (biometricData.get(caller)) {
@@ -55,6 +93,14 @@ actor {
           data.timestamp >= start and data.timestamp <= end
         })
       };
+    }
+  };
+
+  public query(msg) func getWorkouts() : async [Workout] {
+    let caller = msg.caller;
+    switch (workoutData.get(caller)) {
+      case null { [] };
+      case (?userWorkouts) { userWorkouts };
     }
   };
 
@@ -102,6 +148,7 @@ actor {
       (Iter.toArray(biometricData.entries()), func ((p, userData) : (Principal, HashMap.HashMap<Text, BiometricData>)) : (Principal, [(Text, BiometricData)]) {
         (p, Iter.toArray(userData.entries()))
       });
+    workoutEntries := Iter.toArray(workoutData.entries());
   };
 
   system func postupgrade() {
@@ -112,5 +159,6 @@ actor {
         }).vals(),
       0, Principal.equal, Principal.hash
     );
+    workoutData := HashMap.fromIter<Principal, [Workout]>(workoutEntries.vals(), 0, Principal.equal, Principal.hash);
   };
 }

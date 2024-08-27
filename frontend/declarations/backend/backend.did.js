@@ -1,5 +1,12 @@
 export const idlFactory = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
+  const WorkoutType = IDL.Variant({
+    'Weightlifting' : IDL.Null,
+    'Hiit' : IDL.Null,
+    'Liit' : IDL.Null,
+    'Other' : IDL.Null,
+    'Cardio' : IDL.Null,
+  });
   const Time = IDL.Int;
   const BiometricData = IDL.Record({
     'weight' : IDL.Opt(IDL.Float64),
@@ -7,9 +14,20 @@ export const idlFactory = ({ IDL }) => {
     'timestamp' : Time,
     'sleepDuration' : IDL.Opt(IDL.Float64),
   });
+  const Workout = IDL.Record({
+    'startTime' : Time,
+    'endTime' : Time,
+    'caloriesBurned' : IDL.Float64,
+    'workoutType' : WorkoutType,
+  });
   return IDL.Service({
     'addBiometricData' : IDL.Func(
         [IDL.Opt(IDL.Float64), IDL.Opt(IDL.Float64), IDL.Opt(IDL.Float64)],
+        [Result],
+        [],
+      ),
+    'addWorkout' : IDL.Func(
+        [WorkoutType, Time, Time, IDL.Float64],
         [Result],
         [],
       ),
@@ -34,6 +52,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(BiometricData)],
         ['query'],
       ),
+    'getWorkouts' : IDL.Func([], [IDL.Vec(Workout)], ['query']),
   });
 };
 export const init = ({ IDL }) => { return []; };

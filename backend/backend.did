@@ -1,3 +1,18 @@
+type WorkoutType = 
+ variant {
+   Cardio;
+   Hiit;
+   Liit;
+   Other;
+   Weightlifting;
+ };
+type Workout = 
+ record {
+   caloriesBurned: float64;
+   endTime: Time;
+   startTime: Time;
+   workoutType: WorkoutType;
+ };
 type Time = int;
 type Result = 
  variant {
@@ -13,6 +28,7 @@ type BiometricData =
  };
 service : {
   addBiometricData: (opt float64, opt float64, opt float64) -> (Result);
+  addWorkout: (WorkoutType, Time, Time, float64) -> (Result);
   getAggregatedData: () ->
    (record {
       avgHeartRate: opt float64;
@@ -21,4 +37,5 @@ service : {
     }) query;
   getBiometricData: (Time, Time) -> (vec BiometricData) query;
   getLatestBiometricData: () -> (opt BiometricData) query;
+  getWorkouts: () -> (vec Workout) query;
 }

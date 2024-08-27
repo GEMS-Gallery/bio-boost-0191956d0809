@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       identityProvider: process.env.II_URL,
       onSuccess: () => {
         setIsAuthenticated(true);
-        const identity = authClient.getIdentity();
+        const identity= authClient.getIdentity();
         setPrincipal(identity.getPrincipal());
       },
     });
