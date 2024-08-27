@@ -3,29 +3,6 @@ import { Typography, Grid, Paper, TextField, Button, Select, MenuItem, FormContr
 import { useForm, Controller } from 'react-hook-form';
 import { backend } from '../../declarations/backend';
 import { useAuth } from '../context/AuthContext';
-import { Line, Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 interface WorkoutFormData {
   workoutType: string;
@@ -84,65 +61,11 @@ const Workouts: React.FC = () => {
     }
   };
 
-  const cumulativeCaloriesData = {
-    labels: workouts.map((workout, index) => `Workout ${index + 1}`),
-    datasets: [
-      {
-        label: 'Cumulative Calories Burned',
-        data: workouts.reduce((acc, workout, index) => {
-          const prevTotal = index > 0 ? acc[index - 1] : 0;
-          return [...acc, prevTotal + workout.caloriesBurned];
-        }, [] as number[]),
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
-      },
-    ],
-  };
-
-  const caloriesPerWorkoutData = {
-    labels: workouts.map((workout, index) => `Workout ${index + 1}`),
-    datasets: [
-      {
-        label: 'Calories Burned per Workout',
-        data: workouts.map(workout => workout.caloriesBurned),
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      },
-    ],
-  };
-
-  const initialWorkoutTypeCounts = workoutTypes.reduce((acc, type) => {
-    acc[type] = 0;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const workoutTypeCounts = workouts.reduce((acc, workout) => {
-    const type = Object.keys(workout.workoutType)[0];
-    if (workoutTypes.includes(type)) {
-      acc[type] = (acc[type] || 0) + 1;
-    } else {
-      acc['Other'] = (acc['Other'] || 0) + 1;
-    }
-    return acc;
-  }, {...initialWorkoutTypeCounts});
-
-  console.log('Workout type counts:', workoutTypeCounts);
-
-  const workoutTypeCountsData = {
-    labels: workoutTypes,
-    datasets: [
-      {
-        label: 'Number of Workouts by Type',
-        data: workoutTypes.map(type => workoutTypeCounts[type] || 0),
-        backgroundColor: 'rgba(255, 159, 64, 0.5)',
-      },
-    ],
-  };
-
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography variant="h4" gutterBottom>
-          Workouts
+          Add Workout
         </Typography>
       </Grid>
       <Grid item xs={12}>
@@ -229,42 +152,6 @@ const Workouts: React.FC = () => {
               </Grid>
             </Grid>
           </form>
-        </Paper>
-      </Grid>
-      <Grid item xs={12} md={4}>
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Cumulative Calories Burned
-          </Typography>
-          {workouts.length > 0 ? (
-            <Line data={cumulativeCaloriesData} />
-          ) : (
-            <Typography>No workout data available</Typography>
-          )}
-        </Paper>
-      </Grid>
-      <Grid item xs={12} md={4}>
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Calories Burned per Workout
-          </Typography>
-          {workouts.length > 0 ? (
-            <Bar data={caloriesPerWorkoutData} />
-          ) : (
-            <Typography>No workout data available</Typography>
-          )}
-        </Paper>
-      </Grid>
-      <Grid item xs={12} md={4}>
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Number of Workouts by Type
-          </Typography>
-          {Object.values(workoutTypeCounts).some(count => count > 0) ? (
-            <Bar data={workoutTypeCountsData} />
-          ) : (
-            <Typography>No workout data available</Typography>
-          )}
         </Paper>
       </Grid>
     </Grid>
